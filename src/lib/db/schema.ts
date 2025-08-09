@@ -1,9 +1,13 @@
+
+import { relations } from "drizzle-orm";
 import {
   pgTable,
   text,
   timestamp,
   boolean,
+  serial,
   integer,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -70,3 +74,66 @@ export const verification = pgTable("verification", {
     () => /* @__PURE__ */ new Date(),
   ),
 });
+
+
+export const category = pgTable("category", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created-at")
+    .$defaultFn(() => new Date())
+    .notNull()
+})
+
+export const assets = pgTable("assets", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  fileUrl: text("file_url").notNull(),
+  thumbnailUrl: text("thumbnail_url"),
+  isApproved: text("is_approved").default("pending").notNull(),
+  userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+  categoryId: integer("category_id").references(() => category.id),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => new Date())
+    .notNull()
+})
+
+
+export const userRelations = relations(user, ({many}) => ({
+  session: many(session),
+  accounts: many(account),
+  assets: many(assets)
+}))
+
+export const sessionRelations = relations(session, ({one}) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id]
+  })
+}))
+
+export const accountRelations = relations(account, ({one}) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id]
+  })
+}))
+
+export const categoryRelations = relations(category, ({many}) => ({
+  assets: many(assets)
+}))
+
+export const assetsRelations = relations(assets, ({one, many}) => ({
+  user: one(user, {
+    fields: [assets.userId],
+    references: [user.id]
+  }),
+
+  category: one(category, {
+    fields: [assets.categoryId ],
+    references: [category.id]
+  })
+}))

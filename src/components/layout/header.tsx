@@ -80,7 +80,7 @@ function Header() {
               <>
                 <Link
                   className="text-sm font-medium hover:text-teal-600"
-                  href={"/admin/asset-approval"}
+                  href={"/admin/assets-approval"}
                 >
                   Asset Approval
                 </Link>
