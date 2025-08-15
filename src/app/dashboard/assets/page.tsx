@@ -13,14 +13,17 @@ async function AssetsPage() {
 
     if(session === null) return null
 
-    const [categories] = await Promise.all([getCategoriesAction(), getUserAssetsAction(session?.user?.id)])
+    const [categories, assets] = await Promise.all([
+        getCategoriesAction(), 
+        getUserAssetsAction(session?.user?.id)
+    ])
     return ( 
         <div className="container py-6">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-extrabold">My Assets</h1>
                 <AssetsUpload categories={categories || []} />
             </div>
-            <AssetsGrid />
+            <AssetsGrid assets={assets || []} />
         </div>
      );
 }
