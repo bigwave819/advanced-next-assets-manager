@@ -1,7 +1,7 @@
 'use server'
 import { auth } from "@/lib/auth";
 import { assets, category, user } from "./../lib/db/schema";
-import { success, z } from "zod";
+import { z } from "zod";
 import { eq, sql } from "drizzle-orm";
 import { headers } from "next/headers";
 import { db } from "@/lib/db";
@@ -204,12 +204,13 @@ export async function getPendingAssetsAction() {
             asset: assets,
             userName: user.name
         })
-        .from(assets)
-        .leftJoin(user, eq(assets.userId, user.id))
-        .where(eq(assets.isApproved, 'pending'))
+            .from(assets)
+            .leftJoin(user, eq(assets.userId, user.id))
+            .where(eq(assets.isApproved, 'pending'))
 
         return pendingAssets
     } catch (error) {
         return []
     }
 }
+
